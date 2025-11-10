@@ -1,0 +1,26 @@
+/* 간단한 스타일 추가 */
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; margin: 2em; background-color: #fdfdfd; }
+        h1, h2 { color: #333; }
+        hr { border: 0; border-top: 1px solid #eee; }
+        a { 
+            display: inline-block; 
+            margin-bottom: 1em; 
+            background: #007bff; 
+            color: white; 
+            padding: 10px 15px; 
+            border-radius: 6px; 
+            text-decoration: none; 
+        }
+        a:hover { background: #0056b3; }
+        #post-list { list-style: none; padding: 0; }
+        #post-list li { 
+            background: #ffffff; 
+            border: 1px solid #ddd; 
+            border-radius: 8px; 
+            padding: 1.5em; 
+            margin-bottom: 1em; 
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        #post-list li h3 { margin-top: 0; margin-bottom: 0.5em; color: #0056b3; }
+        #post-list li p { margin-bottom: 0.5em; white-space: pre-wrap; } /* 줄바꿈 표시 */
+        #post-list li small { color: #777; font-size: 0.9em; }
