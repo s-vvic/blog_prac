@@ -45,7 +45,7 @@ app.listen(8080, async () => {
 });
 
 app.get('/', (req, res) => {
-    res.redirect("home/home.html");
+    res.redirect("index.html");
 });
 
 // -----------------------------------------------------------------
@@ -72,7 +72,7 @@ app.post('/addPost', async (req, res) => {
         console.log('새 글이 DB에 등록되었습니다 (ID: ' + result.insertId + ')');
 
         // 5. 글 작성이 완료되면, 게시판 페이지(/board.html)로 이동시킵니다.
-        res.redirect('../board/board.html');
+        res.redirect('board/board.html');
 
     } catch (error) {
         // 6. [추가] DB 오류 처리
