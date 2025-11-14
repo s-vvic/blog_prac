@@ -44,7 +44,7 @@ app.listen(8080, async () => {
 });
 
 app.get("/", (req, res) => {
-  res.redirect("docs/index.html");
+  res.redirect("index.html");
 });
 
 // -----------------------------------------------------------------
@@ -71,7 +71,7 @@ app.post("/addPost", async (req, res) => {
     console.log("새 글이 DB에 등록되었습니다 (ID: " + result.insertId + ")");
 
     // 5. 글 작성이 완료되면, 게시판 페이지(/board.html)로 이동시킵니다.
-    res.redirect("docs/board/board.html");
+    res.redirect("board/board.html");
   } catch (error) {
     // 6. [추가] DB 오류 처리
     console.error("DB 저장 중 오류 발생:", error);
@@ -160,7 +160,7 @@ app.get("/api/posts/:id", async (req, res) => {
 
 // [수정] 정적 파일 제공 미들웨어는 API 라우트들 *뒤에* 위치시킵니다.
 // '__dirname'은 현재 파일(server.js)이 있는 폴더의 절대 경로입니다.
-app.use(express.static(path.join(__dirname)));
+app.use(express.static(path.join(__dirname, "docs")));
 
 // [추가] 404 핸들러: 위에서 정의된 라우트 외의 모든 요청 처리
 // (가장 마지막에 위치해야 합니다)
