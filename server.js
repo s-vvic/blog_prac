@@ -160,8 +160,7 @@ app.get("/api/posts/:id", async (req, res) => {
 
 // [수정] 정적 파일 제공 미들웨어는 API 라우트들 *뒤에* 위치시킵니다.
 // '__dirname'은 현재 파일(server.js)이 있는 폴더의 절대 경로입니다.
-// 'docs' 폴더를 웹사이트의 루트(/)로 제공합니다.
-app.use(express.static(path.join(__dirname, "docs")));
+app.use(express.static(path.join(__dirname)));
 
 // [추가] 404 핸들러: 위에서 정의된 라우트 외의 모든 요청 처리
 // (가장 마지막에 위치해야 합니다)
