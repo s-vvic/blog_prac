@@ -26,13 +26,13 @@ a:hover {
 }
 
 /* 세부 글 이동 a태그 */
-#test {
+.post-link {
   display: block;
   background: white;
   color: black;
 }
 
-#test:hover {
+.post-link:hover {
   background: #dddddd;
 }
 

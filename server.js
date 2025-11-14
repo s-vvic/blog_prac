@@ -113,3 +113,61 @@ app.get("/api/posts", async (req, res) => {
     res.status(500).send("서버 오류가 발생했습니다. DB 연결을 확인해주세요.");
   }
 });
+
+// -----------------------------------------------------------------
+// ▼▼▼ [새로 추가된 글 *상세* 조회 API] ▼▼▼
+// -----------------------------------------------------------------
+/**
+ * [GET /api/posts/:id]
+ * 'MySQL DB'에서 특정 id의 글 *하나만* 조회하여 JSON 형태로 반환합니다.
+ * :id 부분은 'URL 파라미터'라고 부릅니다. (예: /api/posts/5)
+ */
+app.get("/api/posts/:id", async (req, res) => {
+  try {
+    // 1. URL 파라미터에서 'id' 값을 가져옵니다. (req.params 사용!)
+    const { id } = req.params;
+
+    // 2. DB에서 특정 id의 글을 조회합니다. (SQL Injection 방지됨)
+    const sql = "SELECT id, title, content, created_at FROM posts WHERE id = ?";
+    const [rows] = await pool.execute(sql, [id]);
+
+    // 3. [중요] 해당 id의 글이 없는 경우, 404 Not Found 응답을 보냅니다.
+    if (rows.length === 0) {
+      return res.status(404).send("해당 ID의 글을 찾을 수 없습니다.");
+    }
+
+    // 4. DB에서 찾은 첫 번째 (그리고 유일한) 글을 post 변수에 저장
+    const post = rows[0];
+
+    // 5. 날짜 포맷을 변경하여 최종 응답 객체를 만듭니다.
+    const postDetails = {
+      id: post.id,
+      title: post.title,
+      content: post.content, // 상세 페이지에서는 전체 내용을 보냅니다.
+      date: new Date(post.created_at).toLocaleString("ko-KR"),
+    };
+
+    // 6. JSON 형태로 클라이언트에게 응답합니다.
+    res.json(postDetails);
+  } catch (error) {
+    // 7. DB 오류 처리
+    console.error("DB 상세 조회 중 오류 발생:", error);
+    res.status(500).send("서버 오류가 발생했습니다.");
+  }
+});
+// -----------------------------------------------------------------
+// ▲▲▲ [새로 추가된 글 *상세* 조회 API] ▲▲▲
+// -----------------------------------------------------------------
+
+// [수정] 정적 파일 제공 미들웨어는 API 라우트들 *뒤에* 위치시킵니다.
+// '__dirname'은 현재 파일(server.js)이 있는 폴더의 절대 경로입니다.
+// 'docs' 폴더를 웹사이트의 루트(/)로 제공합니다.
+app.use(express.static(path.join(__dirname, "docs")));
+
+// [추가] 404 핸들러: 위에서 정의된 라우트 외의 모든 요청 처리
+// (가장 마지막에 위치해야 합니다)
+app.use((req, res) => {
+  // 404.html 파일을 만들어서 보여주거나, 간단히 텍스트를 보낼 수 있습니다.
+  res.status(404).send("페이지를 찾을 수 없습니다 (404 Not Found)");
+  // res.status(404).sendFile(path.join(__dirname, 'docs/404.html'));
+});

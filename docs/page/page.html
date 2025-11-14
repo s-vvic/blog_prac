@@ -1,11 +1,31 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Page test</title>
+    <title>글 상세</title>
+    <!-- [중요] page.js 스크립트 파일을 로드합니다. -->
+    <script src="page.js" defer></script>
+    <link rel="stylesheet" href="page.css"></style>
   </head>
   <body>
-    <p>cotent</p>
+    <div class="container">
+      <!-- 
+          "엔진" 역할을 하는 page.js 스크립트가
+          이 <h1>, <small>, <div> 태그의 내용을
+          서버에서 받아온 데이터로 채워줄 것입니다.
+        -->
+
+      <!-- 1. 제목이 들어갈 곳 -->
+      <h1 id="post-title" class="loading">로딩 중...</h1>
+
+      <!-- 2. 날짜가 들어갈 곳 -->
+      <small id="post-date"></small>
+
+      <!-- 3. 본문 내용이 들어갈 곳 -->
+      <div id="post-content"></div>
+
+      <a href="../board/board.html" class="back-link">← 목록으로 돌아가기</a>
+    </div>
   </body>
 </html>

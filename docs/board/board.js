@@ -20,16 +20,7 @@ async function fetchPosts() {
     const postListElement = document.getElementById("post-list");
 
     // 4. "로딩 중..." 메시지를 지웁니다.
-    postListElement.innerHTML =
-      "<li>" +
-      "<!-- 글로 이동하기 예시-->" +
-      '<a href="../page/page.html" id="test">' +
-      "<h3>글 페이지 이동 예시</h3>" +
-      "<p>content</p>" +
-      "<br>" +
-      "<small>2025.xx.xx</small>" +
-      "</a>" +
-      "</li>";
+    postListElement.innerHTML = "";
     //
 
     // 5. 만약 글이 하나도 없으면 메시지를 표시합니다.
@@ -41,29 +32,39 @@ async function fetchPosts() {
 
     // 6. 받아온 'posts' 배열을 순회하면서 HTML을 만듭니다.
     posts.forEach((post) => {
+      // ul 안에 넣을 li 생성
       const postItem = document.createElement("li");
 
-      // XSS(Cross-Site Scripting) 방지를 위해 텍스트를 안전하게 처리합니다.
-      const title = document.createTextNode(post.title);
-      const content = document.createTextNode(post.content);
-      const date = document.createTextNode(post.date);
+      // 각 페이지 이동을 위한 a 생성
+      const linkElement = document.createElement("a");
+      // <a> 태그에 post-link 클래스 추가 (스타일링용)
+      linkElement.className = "post-link";
 
+      // [중요] 링크 주소를 동적으로 만듭니다.
+      // 예: ../page/page.html?id=1, ../page/page.html?id=2 ...
+      // 이렇게 해야 상세 페이지에서 '어떤 글'을 보여줄지 알 수 있습니다.
+      linkElement.href = `../page/page.html?id=${post.id}`;
+
+      // XSS(Cross-Site Scripting) 방지를 위해 텍스트를 안전하게 처리합니다.
       const titleEl = document.createElement("h3");
-      titleEl.appendChild(title);
+      titleEl.textContent = post.title; // XSS 방지
 
       const contentEl = document.createElement("p");
-      contentEl.appendChild(content);
+      contentEl.textContent = post.content; // XSS 방지
 
       const dateEl = document.createElement("small");
-      dateEl.appendChild(date);
+      dateEl.textContent = post.date; // DB에서 가져온 날짜
 
-      // <li> 안에 생성된 요소들을 추가합니다.
-      postItem.appendChild(titleEl);
-      postItem.appendChild(contentEl);
-      postItem.appendChild(document.createElement("br")); // 줄바꿈
-      postItem.appendChild(dateEl);
+      // <a> 안에 생성된 요소들을 추가합니다.
+      linkElement.appendChild(titleEl);
+      linkElement.appendChild(contentEl);
+      linkElement.appendChild(document.createElement("br"));
+      linkElement.appendChild(dateEl);
 
-      // 7. 완성된 <li>를 <ul>에 추가합니다.
+      // --- 5. 완성된 <a> 태그를 <li>에 넣습니다 ---
+      postItem.appendChild(linkElement);
+
+      // --- 6. 완성된 <li> 태그를 <ul>에 넣습니다 ---
       postListElement.appendChild(postItem);
     });
   } catch (error) {
