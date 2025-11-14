@@ -29,7 +29,6 @@ app.use(express.json());
 // 파싱할 수 있게 해주는 옵션입니다.
 // 이 코드가 있어야 req.body에서 폼 데이터를 볼 수 있습니다!
 app.use(express.urlencoded({ extended: true }));
-app.use(express.static(path.join(__dirname)));
 // -----------------------------------------------------------------
 
 app.listen(8080, async () => {
