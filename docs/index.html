@@ -1,15 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
-    <link rel="stylesheet" href="index.css">
-</head>
-<body>
+    <link rel="stylesheet" href="index.css" />
+  </head>
+  <body>
     <h1>글쓰기 연습 페이지</h1>
     <a href="board/board.html" class="nav-link">게시판 보러가기</a>
-    <hr>
+    <hr />
 
     <h3>새 글 작성하기</h3>
     <!-- 
@@ -18,19 +18,25 @@
       - method="POST": 데이터를 전송(Create)하는 방식입니다.
     -->
     <form action="/addPost" method="POST">
-        <div id='title'>
-            <label for="titleContent">제목:</label>
-            <!-- 'name' 속성이 서버에서 req.body.postTitle이 됩니다. -->
-            <input type="text" id="titleContent" name="postTitle" required>
-        </div>
-        <div id='content'>
-            <label for="postContent">내용:</label>
-            <!-- 'name' 속성이 서버에서 req.body.postContent가 됩니다. -->
-            <textarea id="postContent" name="postContent" rows="5" cols="50" required></textarea>
-        </div>
-        <div style="margin-top: 10px;">
-            <button type="submit">글쓰기</button>
-        </div>
+      <div id="title">
+        <label for="titleContent">제목:</label>
+        <!-- 'name' 속성이 서버에서 req.body.postTitle이 됩니다. -->
+        <input type="text" id="titleContent" name="postTitle" required />
+      </div>
+      <div id="content">
+        <label for="postContent">내용:</label>
+        <!-- 'name' 속성이 서버에서 req.body.postContent가 됩니다. -->
+        <textarea
+          id="postContent"
+          name="postContent"
+          rows="5"
+          cols="50"
+          required
+        ></textarea>
+      </div>
+      <div style="margin-top: 10px">
+        <button type="submit">글쓰기</button>
+      </div>
     </form>
-</body>
+  </body>
 </html>
