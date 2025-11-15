@@ -42,22 +42,70 @@ body {
   z-index: 10; /* 다른 요소보다 위에 있도록 설정 */
 }
 
-/* [새로 추가] 콘텐츠 영역 (스크롤될 부분) */
+/* * ▼ [새로 추가] 메인 영역 컨테이너 ▼
+         * 헤더 아래의 남은 공간 전체를 차지하며,
+         * '스크롤 영역'과 '사이드바'를 가로로 나눕니다.
+        */
+.main-area-container {
+  flex-grow: 1; /* 헤더 뺀 나머지 높이 모두 차지 */
+  display: flex; /* 자식(스크롤, 사이드바)을 가로로 배치 */
+  flex-direction: row;
+
+  /* [중요] 자식 요소(.scrollable-content)가 
+             * 스크롤을 가질 것이므로, 이 컨테이너 자체는 
+             * 높이가 넘쳐도 스크롤바가 생기지 않도록 합니다.
+             */
+  overflow: hidden;
+}
+
+/* [수정] 콘텐츠 영역 (스크롤될 부분) */
 .scrollable-content {
   /* [중요] flex-grow: 1;
-             * 헤더를 제외한 '남은 모든 세로 공간'을 이 영역이 차지합니다.
+             * .main-area-container 안에서
+             * 사이드바를 제외한 '남은 모든 가로 공간'을 차지합니다.
              */
   flex-grow: 1;
+  overflow-y: auto; /* 세로 스크롤 */
+  padding: 2em;
 
-  /* [핵심] overflow-y: auto;
-             * 이 영역의 높이보다 내용물(<ul>)이 더 많아지면,
-             * 이 영역 *내부*에만 세로 스크롤바가 생깁니다.
-             */
-  overflow-y: auto;
-
-  padding: 2em; /* 목록의 좌우 여백 */
+  /* [선택] 목록의 최대 너비를 제한하여 가독성을 높입니다. */
+  margin: 0 auto; /* max-width와 함께 사용시 중앙 정렬 */
 }
-/* ▲ [새로 추가된 레이아웃 CSS] ▲ */
+
+/* * ▼ [새로 추가] 사이드바 영역 ▼
+        */
+.sidebar {
+  /* [중요] flex-shrink: 0;
+             * 화면이 줄어들어도 사이드바의 너비는 줄어들지 않습니다.
+             */
+  flex-shrink: 0;
+  width: 280px; /* 사이드바 너비 */
+  background-color: #f9f9f9;
+  border-left: 1px solid #eee;
+  padding: 2em;
+
+  /* * 사이드바 자체 스크롤 (선택 사항)
+             * 만약 사이드바 내용이 길어질 경우를 대비합니다.
+            */
+  overflow-y: auto;
+}
+.sidebar-widget {
+  background: #fff;
+  padding: 1.5em;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  margin-bottom: 1.5em;
+}
+.sidebar-widget h4 {
+  margin-top: 0;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 0.5em;
+}
+.sidebar-widget p {
+  font-size: 0.9em;
+  color: #555;
+}
+/* ▲ [레이아웃 CSS 수정됨] ▲ */
 
 /* --- 기존 스타일 (일부 수정됨) --- */
 
