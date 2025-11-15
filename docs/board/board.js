@@ -21,7 +21,6 @@ async function fetchPosts() {
 
     // 4. "로딩 중..." 메시지를 지웁니다.
     postListElement.innerHTML = "";
-    //
 
     // 5. 만약 글이 하나도 없으면 메시지를 표시합니다.
     if (posts.length === 0) {

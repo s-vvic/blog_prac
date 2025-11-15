@@ -4,20 +4,30 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>게시판</title>
+    <script src="board.js" defer></script>
     <link rel="stylesheet" href="board.css" />
   </head>
-  <body>
-    <h1>게시판</h1>
-    <hr />
+  <!-- 
+  [수정]
+  <body>에 바로 내용을 넣지 않고,
+  .layout-wrapper로 감싸서 Flexbox 레이아웃을 적용합니다.
+-->
+  <body class="layout-wrapper">
+    <!-- 1. 고정될 헤더 영역 -->
+    <header class="page-header">
+      <h1>게시판</h1>
 
-    <!-- [수정됨] 폼 대신 간단한 링크로 변경 -->
-    <a href="../index.html">새 글 쓰러가기</a>
+      <a href="../index.html">새 글 쓰러가기</a>
 
-    <h2>글 목록</h2>
-    <ul id="post-list">
-      <!-- JavaScript가 이 부분을 채울 것입니다. -->
-      <li>글 목록을 불러오는 중...</li>
-    </ul>
-    <script src="board.js"></script>
+      <h2>글 목록</h2>
+    </header>
+
+    <!-- 2. 스크롤될 메인 콘텐츠 영역 -->
+    <main class="scrollable-content">
+      <ul id="post-list">
+        <!-- JavaScript가 이 부분을 채울 것입니다. -->
+        <li>글 목록을 불러오는 중...</li>
+      </ul>
+    </main>
   </body>
 </html>
