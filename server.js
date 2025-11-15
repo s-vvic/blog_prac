@@ -8,7 +8,6 @@ require("dotenv").config();
 // -----------------------------------------------------------------
 // ▼ MySQL DB 연결 설정 ▼
 // -----------------------------------------------------------------
-// ⚠️ 주의: 이 값들을 본인의 로컬 DB 설정에 맞게 수정하세요!
 const dbConfig = {
   host: process.env.DB_HOST, // MySQL 서버 주소 (대부분 'localhost')
   user: process.env.DB_USER, // MySQL 사용자 이름
@@ -20,14 +19,9 @@ const dbConfig = {
 const pool = mysql.createPool(dbConfig);
 
 // -----------------------------------------------------------------
-// ▼ POST 요청 처리를 위한 미들웨어 (Middleware) 추가 ▼
+// ▼ 미들웨어 (Middleware) 설정 ▼
 // -----------------------------------------------------------------
-// express.json(): 요청 본문(body)이 JSON 형태일 때 파싱(해석)해줍니다.
 app.use(express.json());
-// express.urlencoded(): HTML 폼(form)에서 'application/x-www-form-urlencoded'
-// 형태로 전송된 데이터를 파싱해줍니다. { extended: true }는 복잡한 객체도
-// 파싱할 수 있게 해주는 옵션입니다.
-// 이 코드가 있어야 req.body에서 폼 데이터를 볼 수 있습니다!
 app.use(express.urlencoded({ extended: true }));
 // -----------------------------------------------------------------
 
@@ -79,48 +73,62 @@ app.post("/addPost", async (req, res) => {
   }
 });
 
-/**
- * [GET /api/posts]
- * 'MySQL DB'에서 모든 글 목록을 조회하여 JSON 형태로 반환합니다.
- */
+// -----------------------------------------------------------------
+// ▼▼▼ [수정된 글 *목록* 조회 API (페이지네이션 적용)] ▼▼▼
+// -----------------------------------------------------------------
 app.get("/api/posts", async (req, res) => {
-  // async 추가
   try {
-    // 1. [수정] DB에서 글 목록을 조회합니다.
-    // 최신 글이 위로 오도록 id 내림차순(DESC)으로 정렬합니다.
-    const sql =
-      "SELECT id, title, content, created_at FROM posts ORDER BY id DESC";
+    // 1. 클라이언트가 요청한 페이지 번호를 가져옵니다. (쿼리 파라미터)
+    // (예: /api/posts?page=2)
+    const page = parseInt(req.query.page || "1", 10);
+    // 한 페이지에 보여줄 글의 수
+    const limit = 20;
+    // DB에서 건너뛸 개수 계산
+    const offset = (page - 1) * limit;
 
-    // [rows]는 조회된 결과 배열, [fields]는 컬럼 정보입니다.
-    const [rows] = await pool.execute(sql);
+    // 2. [쿼리 1] 총 글의 개수를 셉니다. (총 페이지 수를 계산하기 위해)
+    const countSql = "SELECT COUNT(*) as totalPosts FROM posts";
+    const [countRows] = await pool.execute(countSql);
+    const totalPosts = countRows[0].totalPosts;
+    const totalPages = Math.ceil(totalPosts / limit);
 
-    // 2. [추가] board.html 호환을 위해 데이터 포맷을 변경합니다.
-    // (DB의 'created_at'을 'date' 문자열로 변경)
-    const posts = rows.map((post) => ({
+    // 3. [쿼리 2] 현재 페이지만큼의 글만 가져옵니다. (LIMIT, OFFSET 사용)
+    // ▼▼▼ [수정된 부분] ▼▼▼
+    // ? 플레이스홀더 대신, JavaScript 템플릿 리터럴( `` )을 사용해
+    // "안전하게 검증된" limit와 offset 변수를 문자열에 직접 삽입합니다.
+    const postsSql = `
+      SELECT id, title, content, created_at 
+      FROM posts 
+      ORDER BY id DESC 
+      LIMIT ${limit} OFFSET ${offset}
+    `;
+    // [limit, offset] 순서로 값을 전달합니다.
+    const [postsRows] = await pool.execute(postsSql);
+
+    // 4. 가져온 글 목록의 포맷을 변경합니다.
+    const posts = postsRows.map((post) => ({
       id: post.id,
       title: post.title,
-      content: post.content,
-      // (DATETIME 객체를 한국 시간 문자열로 변환)
+      content:
+        post.content.substring(0, 50) + (post.content.length > 50 ? "..." : ""),
       date: new Date(post.created_at).toLocaleString("ko-KR"),
     }));
 
-    // 3. JSON 형태로 클라이언트에게 응답합니다.
-    res.json(posts);
+    // 5. [수정] JSON 응답에 '글 목록(posts)'과 '총 페이지 수(totalPages)'를 함께 보냅니다.
+    res.json({
+      posts: posts,
+      totalPages: totalPages,
+      currentPage: page,
+    });
   } catch (error) {
-    // 4. [추가] DB 오류 처리
-    console.error("DB 조회 중 오류 발생:", error);
-    res.status(500).send("서버 오류가 발생했습니다. DB 연결을 확인해주세요.");
+    console.error("DB 목록 조회 중 오류 발생:", error);
+    res.status(500).send("서버 오류가 발생했습니다.");
   }
 });
+// -----------------------------------------------------------------
+// ▲▲▲ [수정된 글 *목록* 조회 API (페이지네이션 적용)] ▲▲▲
+// -----------------------------------------------------------------
 
-// -----------------------------------------------------------------
-// ▼▼▼ [새로 추가된 글 *상세* 조회 API] ▼▼▼
-// -----------------------------------------------------------------
-/**
- * [GET /api/posts/:id]
- * 'MySQL DB'에서 특정 id의 글 *하나만* 조회하여 JSON 형태로 반환합니다.
- * :id 부분은 'URL 파라미터'라고 부릅니다. (예: /api/posts/5)
- */
 app.get("/api/posts/:id", async (req, res) => {
   try {
     // 1. URL 파라미터에서 'id' 값을 가져옵니다. (req.params 사용!)
@@ -149,23 +157,15 @@ app.get("/api/posts/:id", async (req, res) => {
     // 6. JSON 형태로 클라이언트에게 응답합니다.
     res.json(postDetails);
   } catch (error) {
-    // 7. DB 오류 처리
     console.error("DB 상세 조회 중 오류 발생:", error);
     res.status(500).send("서버 오류가 발생했습니다.");
   }
 });
-// -----------------------------------------------------------------
-// ▲▲▲ [새로 추가된 글 *상세* 조회 API] ▲▲▲
-// -----------------------------------------------------------------
 
-// [수정] 정적 파일 제공 미들웨어는 API 라우트들 *뒤에* 위치시킵니다.
-// '__dirname'은 현재 파일(server.js)이 있는 폴더의 절대 경로입니다.
+// 정적 파일 제공 미들웨어
 app.use(express.static(path.join(__dirname, "docs")));
 
-// [추가] 404 핸들러: 위에서 정의된 라우트 외의 모든 요청 처리
-// (가장 마지막에 위치해야 합니다)
+// 404 핸들러
 app.use((req, res) => {
-  // 404.html 파일을 만들어서 보여주거나, 간단히 텍스트를 보낼 수 있습니다.
   res.status(404).send("페이지를 찾을 수 없습니다 (404 Not Found)");
-  // res.status(404).sendFile(path.join(__dirname, 'docs/404.html'));
 });

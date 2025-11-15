@@ -58,19 +58,45 @@ body {
   overflow: hidden;
 }
 
-/* [수정] 콘텐츠 영역 (스크롤될 부분) */
-.scrollable-content {
-  /* [중요] flex-grow: 1;
-             * .main-area-container 안에서
-             * 사이드바를 제외한 '남은 모든 가로 공간'을 차지합니다.
-             */
-  flex-grow: 1;
-  overflow-y: auto; /* 세로 스크롤 */
-  padding: 2em;
+/* * [수정] .scrollable-content -> .main-column
+         * 이 태그는 '스크롤되는 영역'이 아니라 '왼쪽 컬럼 전체'를 의미합니다.
+         * 이 자체가 flex-column이 되어, '리스트'와 '페이지바'를 나눕니다.
+         */
+.main-column {
+  flex-grow: 1; /* 사이드바 빼고 다 차지 */
+  min-width: 0; /* flexbox 비율 계산용 */
 
-  /* [선택] 목록의 최대 너비를 제한하여 가독성을 높입니다. */
-  max-width: 900px;
-  margin: 0 auto; /* max-width와 함께 사용시 중앙 정렬 */
+  display: flex;
+  flex-direction: column; /* 리스트(상), 페이지바(하) */
+  overflow: hidden; /* 이 컬럼 자체는 스크롤 안됨 */
+}
+
+/* * [신규] .list-wrapper
+         * '리스트(ul)'를 감싸는 영역입니다.
+         * 이 영역이 '남은 높이'를 다 차지하고, '스크롤'됩니다.
+         */
+.list-wrapper {
+  flex-grow: 1; /* 페이지바를 제외한 모든 높이 차지 */
+  overflow-y: auto; /* 세로 스크롤 */
+  padding: 2em; /* 스크롤 영역에만 패딩 적용 */
+}
+
+/* * [수정] #pagination-nav
+         * '리스트'와 분리되어 '왼쪽 컬럼'의 자식이 되었습니다.
+         */
+#pagination-nav {
+  flex-shrink: 0; /* 높이가 줄어들지 않음 */
+
+  /* '앱 바'처럼 보이도록 스타일 추가 */
+  padding: 1em 2em;
+  border-top: 1px solid #eee;
+  background-color: #ffffff;
+  box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.03);
+
+  /* (기존 스타일) */
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 /* * ▼ [새로 추가] 사이드바 영역 ▼
@@ -227,4 +253,41 @@ body {
 .post-link small {
   color: #777;
   font-size: 0.9em;
+}
+
+/* ---------------------------------------------------- */
+/* ▼▼▼ [페이지네이션(페이지 나누기) 스타일 추가됨] ▼▼▼ */
+/* ---------------------------------------------------- */
+#pagination-nav {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 2em 0 1em 0;
+}
+#pagination-nav button {
+  background: #fff;
+  border: 1px solid #ddd;
+  color: #007bff;
+  padding: 0.5em 1em;
+  margin: 0 0.25em;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1em;
+  transition: background-color 0.2s, color 0.2s;
+}
+#pagination-nav button:hover {
+  background-color: #f4f4f4;
+}
+/* 현재 페이지를 나타내는 'active' 클래스 스타일 */
+#pagination-nav button.active {
+  background-color: #007bff;
+  color: white;
+  border-color: #007bff;
+  font-weight: bold;
+}
+/* 비활성화된 버튼 (예: 이전/다음) */
+#pagination-nav button:disabled {
+  color: #aaa;
+  cursor: not-allowed;
+  background-color: #f9f9f9;
 }

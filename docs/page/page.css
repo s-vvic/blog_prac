@@ -22,7 +22,7 @@ body {
   font-size: 0.9em;
   color: #777;
   border-bottom: 1px solid #eee;
-  padding-bottom: 1em;
+  padding-bottom: 0.3em;
   margin-bottom: 2em;
 }
 /* [중요] 이 스타일은 DB에 저장된 줄바꿈(\n)을 

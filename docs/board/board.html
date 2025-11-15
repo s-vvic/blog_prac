@@ -24,12 +24,23 @@
 
     <!-- 2. 스크롤될 메인 콘텐츠 영역 -->
     <div class="main-area-container">
-      <main class="scrollable-content">
-        <ul id="post-list">
-          <!-- JavaScript가 이 부분을 채울 것입니다. -->
-          <li>글 목록을 불러오는 중...</li>
-        </ul>
+      <main class="main-column">
+        <!-- (A) [신규] '스크롤'될 리스트 래퍼 -->
+        <div class="list-wrapper">
+          <ul id="post-list">
+            <!-- JavaScript가 이 부분을 채울 것입니다. -->
+            <li>글 목록을 불러오는 중...</li>
+          </ul>
+        </div>
+
+        <!-- 
+              (B) [이동] 페이지네이션 바
+              이제 스크롤 영역(list-wrapper)의 '외부'에 위치합니다.
+              따라서 .main-column의 하단에 고정됩니다.
+            -->
+        <nav id="pagination-nav" aria-label="Page navigation"></nav>
       </main>
+      <!-- .main-column 끝 -->
       <aside class="sidebar">
         <div class="sidebar-widget">
           <h4>사이드바 위젯 1</h4>
