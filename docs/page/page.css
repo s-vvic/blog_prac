@@ -25,6 +25,23 @@ body {
   padding-bottom: 0.3em;
   margin-bottom: 2em;
 }
+#delete {
+  float: right;
+  font-size: 0.9em;
+  border-radius: 10%;
+  border-width: 1px;
+  background-color: #fff;
+  margin-bottom: 2em;
+  margin-left: 10px;
+}
+#edit {
+  float: right;
+  font-size: 0.9em;
+  border-radius: 10%;
+  border-width: 1px;
+  background-color: #fff;
+  margin-bottom: 2em;
+}
 /* [중요] 이 스타일은 DB에 저장된 줄바꿈(\n)을 
            HTML 화면에 <br> 태그 없이도 그대로 표시해줍니다. */
 #post-content {

@@ -62,3 +62,8 @@ function displayError(message) {
         `;
   }
 }
+
+// 수정 및 삭제 버튼
+function editButton() {
+  const editTitle = document.querySelector("edit");
+}
