@@ -37,6 +37,10 @@ function setupButtons(postId) {
       }
     }
   });
+
+  editBtn.addEventListener("click", async () => {
+    alert("수정 기능은 아직 준비중입니다.");
+  });
 }
 
 // 서버에 특정 id의 글 상세 정보를 요청하는 비동기 함수
