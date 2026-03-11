@@ -21,16 +21,16 @@ function setupButtons(postId) {
   const editBtn = document.getElementById("edit");
 
   deleteBtn.addEventListener("click", async () => {
-    if (confirm("정말fh 이 글을 삭제하시겠습니까?")) {
+    if (confirm("정말 이 글을 삭제하시겠습니까?")) {
       try {
-        const response = await fetch(`api/post/${postId}`, {
-          method: "DELETE}",
+        const response = await fetch(`/api/posts/${postId}`, {
+          method: "DELETE",
         });
         if (response.ok) {
           alert("성공적으로 삭제되었습니다.");
-          location.href("../board/board.html");
+          location.href = "../board/board.html";
         } else {
-          alert("삭제 과정에서 문제가 발생하였습니다.");
+          alert("삭제에 실패했습니다.");
         }
       } catch (error) {
         console.error("삭제 중 오류 :", error);

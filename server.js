@@ -162,15 +162,8 @@ app.get("/api/posts/:id", async (req, res) => {
   }
 });
 
-// 정적 파일 제공 미들웨어
-app.use(express.static(path.join(__dirname, "docs")));
-
-// 404 핸들러
-app.use((req, res) => {
-  res.status(404).send("페이지를 찾을 수 없습니다 (404 Not Found)");
-});
-
-app.delete("/api/post/:id", async (req, res) => {
+// 글 삭제 로직
+app.delete("/api/posts/:id", async (req, res) => {
   try {
     const { id } = req.params;
     const sql = "DELETE FROM posts WHERE id = ?";
@@ -186,4 +179,12 @@ app.delete("/api/post/:id", async (req, res) => {
     console.error("DB 삭제 중 오류:", error);
     res.status(500).send("서버 오류가 발생했습니다.");
   }
+});
+
+// 정적 파일 제공 미들웨어
+app.use(express.static(path.join(__dirname, "docs")));
+
+// 404 핸들러
+app.use((req, res) => {
+  res.status(404).send("페이지를 찾을 수 없습니다 (404 Not Found)");
 });
