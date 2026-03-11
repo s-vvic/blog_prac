@@ -181,6 +181,24 @@ app.delete("/api/posts/:id", async (req, res) => {
   }
 });
 
+// server.js에 추가
+app.put("/api/posts/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { postTitle, postContent } = req.body;
+
+    const sql = "UPDATE posts SET title = ?, content = ? WHERE id = ?";
+    const [result] = await pool.execute(sql, [postTitle, postContent, id]);
+
+    if (result.affectedRows === 0) {
+      return res.status(404).send("수정할 글을 찾을 수 없습니다.");
+    }
+    res.send("수정 성공");
+  } catch (error) {
+    res.status(500).send("서버 오류");
+  }
+});
+
 // 정적 파일 제공 미들웨어
 app.use(express.static(path.join(__dirname, "docs")));
 

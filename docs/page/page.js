@@ -39,7 +39,7 @@ function setupButtons(postId) {
   });
 
   editBtn.addEventListener("click", async () => {
-    alert("수정 기능은 아직 준비중입니다.");
+    location.href = `../edit/edit.html?id=${postId}`;
   });
 }
 
