@@ -8,11 +8,40 @@ window.addEventListener("DOMContentLoaded", () => {
   if (postId) {
     // 3. 그 id로 서버에 글 상세 정보를 요청하는 함수를 호출합니다.
     fetchPostDetails(postId);
+    setupButtons(postId);
   } else {
     // 4. id 값이 없으면 오류 메시지를 표시합니다.
     displayError("잘못된 접근입니다. (ID가 없습니다)");
   }
 });
+
+// 수정/삭제 버튼 이벤트 등록
+function setupButtons(postId) {
+  const deleteBtn = document.getElementById("delete");
+  const editBtn = document.getElementById("edit");
+
+  deleteBtn.addEventListener("click", async () => {
+    if (confirm("정말 이 글을 삭제하시겠습니까?")) {
+      try {
+        const response = await fetch(`/api/posts/${postId}`, {
+          method: "DELETE",
+        });
+        if (response.ok) {
+          alert("성공적으로 삭제되었습니다.");
+          location.href = "../board/board.html";
+        } else {
+          alert("삭제에 실패했습니다.");
+        }
+      } catch (error) {
+        console.error("삭제 중 오류 :", error);
+      }
+    }
+  });
+
+  editBtn.addEventListener("click", async () => {
+    alert("수정 기능은 아직 준비중입니다.");
+  });
+}
 
 // 서버에 특정 id의 글 상세 정보를 요청하는 비동기 함수
 async function fetchPostDetails(postId) {
@@ -61,4 +90,9 @@ function displayError(message) {
             <a href="../board/board.html" class="back-link">← 목록으로 돌아가기</a>
         `;
   }
+}
+
+// 수정 및 삭제 버튼
+function editButton() {
+  const editTitle = document.querySelector("edit");
 }

@@ -162,6 +162,25 @@ app.get("/api/posts/:id", async (req, res) => {
   }
 });
 
+// 글 삭제 로직
+app.delete("/api/posts/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const sql = "DELETE FROM posts WHERE id = ?";
+    const [result] = await pool.execute(sql, [id]);
+
+    if (result.affectedRows === 0) {
+      return res.status(404).send("삭제할 글을 찾을 수 없습니다.");
+    }
+
+    console.log(`글 삭제 완료 (ID: ${id})`);
+    res.status(200).send("삭제 성공");
+  } catch (error) {
+    console.error("DB 삭제 중 오류:", error);
+    res.status(500).send("서버 오류가 발생했습니다.");
+  }
+});
+
 // 정적 파일 제공 미들웨어
 app.use(express.static(path.join(__dirname, "docs")));
 
