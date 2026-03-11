@@ -25,7 +25,8 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 // -----------------------------------------------------------------
 
-app.listen(8080, async () => {
+const PORT = process.env.PORT || 8080;
+app.listen(PORT, async () => {
   // 서버가 시작될 때 DB 연결을 테스트합니다.
   try {
     const connection = await pool.getConnection();
@@ -34,7 +35,7 @@ app.listen(8080, async () => {
   } catch (error) {
     console.error("MySQL 연결 실패:", error);
   }
-  console.log("listening on 8080");
+  console.log(`listening on ${PORT}`);
 });
 
 app.get("/", (req, res) => {
@@ -178,6 +179,24 @@ app.delete("/api/posts/:id", async (req, res) => {
   } catch (error) {
     console.error("DB 삭제 중 오류:", error);
     res.status(500).send("서버 오류가 발생했습니다.");
+  }
+});
+
+// server.js에 추가
+app.put("/api/posts/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { postTitle, postContent } = req.body;
+
+    const sql = "UPDATE posts SET title = ?, content = ? WHERE id = ?";
+    const [result] = await pool.execute(sql, [postTitle, postContent, id]);
+
+    if (result.affectedRows === 0) {
+      return res.status(404).send("수정할 글을 찾을 수 없습니다.");
+    }
+    res.send("수정 성공");
+  } catch (error) {
+    res.status(500).send("서버 오류");
   }
 });
 
