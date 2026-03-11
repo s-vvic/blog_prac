@@ -25,7 +25,8 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 // -----------------------------------------------------------------
 
-app.listen(8080, async () => {
+const PORT = process.env.PORT || 8080;
+app.listen(PORT, async () => {
   // 서버가 시작될 때 DB 연결을 테스트합니다.
   try {
     const connection = await pool.getConnection();
@@ -34,7 +35,7 @@ app.listen(8080, async () => {
   } catch (error) {
     console.error("MySQL 연결 실패:", error);
   }
-  console.log("listening on 8080");
+  console.log(`listening on ${PORT}`);
 });
 
 app.get("/", (req, res) => {
