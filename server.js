@@ -13,6 +13,8 @@ const dbConfig = {
   user: process.env.DB_USER, // MySQL 사용자 이름
   password: process.env.DB_PASSWORD, // MySQL 비밀번호
   database: process.env.DB_DATABASE, // 사용할 데이터베이스(스키마) 이름
+  port: process.env.DB_PORT || 3306, // 포트 정보 추가
+  ssl: { rejectUnauthorized: false }, // SSL 설정 추가
 };
 
 // DB 연결 풀(Pool) 생성
