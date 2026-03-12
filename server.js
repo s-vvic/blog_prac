@@ -184,6 +184,9 @@ app.get("/api/posts/:id", async (req, res) => {
 
 // 글에 이미지 추가
 app.post("/addPost", upload.single("postImage"), async (req, res) => {
+  console.log("Content-Type:", req.headers["content-type"]);
+  console.log("req.body 데이터:", req.body);
+  console.log("req.file 데이터:", req.file);
   try {
     const { postTitle, postContent } = req.body;
     // 업로드된 파일의 URL은 req.file.path에 담겨 있습니다.
