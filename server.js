@@ -1,6 +1,9 @@
 const express = require("express");
 const path = require("path");
 const mysql = require("mysql2/promise");
+const cloudinary = require("cloudinary").v2;
+const multer = require("multer");
+const { CloudinaryStorage } = require("multer-storage-cloudinary");
 const app = express();
 
 require("dotenv").config();
@@ -17,6 +20,22 @@ const dbConfig = {
   ssl: { rejectUnauthorized: false }, // SSL 설정 추가
 };
 
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
+
+const storage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: "blog_images", // Cloudinary 내 폴더 이름
+    format: async (req, file) => "png", // 저장 포맷
+    public_id: (req, file) => Date.now() + "-" + file.originalname,
+  },
+});
+const upload = multer({ storage: storage });
+
 // DB 연결 풀(Pool) 생성
 const pool = mysql.createPool(dbConfig);
 
@@ -27,7 +46,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 // -----------------------------------------------------------------
 
-const PORT = process.env.PORT || 8080;
+const PORT = process.env.DB_PORT || 8080;
 app.listen(PORT, async () => {
   // 서버가 시작될 때 DB 연결을 테스트합니다.
   try {
@@ -162,6 +181,29 @@ app.get("/api/posts/:id", async (req, res) => {
   } catch (error) {
     console.error("DB 상세 조회 중 오류 발생:", error);
     res.status(500).send("서버 오류가 발생했습니다.");
+  }
+});
+
+// 글에 이미지 추가
+app.post("/addPost", upload.single("postImage"), async (req, res) => {
+  try {
+    const { postTitle, postContent } = req.body;
+    // 업로드된 파일의 URL은 req.file.path에 담겨 있습니다.
+    const imageUrl = req.file ? req.file.path : null;
+
+    if (!postTitle || !postContent) {
+      return res.status(400).send("제목과 내용을 입력해주세요.");
+    }
+
+    // DB 쿼리에 image_url 추가
+    const sql =
+      "INSERT INTO posts (title, content, image_url) VALUES (?, ?, ?)";
+    await pool.execute(sql, [postTitle, postContent, imageUrl]);
+
+    res.redirect("board/board.html");
+  } catch (error) {
+    console.error("업로드 중 오류:", error);
+    res.status(500).send("서버 오류 발생");
   }
 });
 

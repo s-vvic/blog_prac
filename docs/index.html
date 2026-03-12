@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -23,6 +23,12 @@
         <!-- 'name' 속성이 서버에서 req.body.postTitle이 됩니다. -->
         <input type="text" id="titleContent" name="postTitle" required />
       </div>
+
+      <div style="margin-bottom: 1.2em">
+        <label for="postImage">이미지 첨부:</label>
+        <input type="file" id="postImage" name="postImage" accept="image/*" />
+      </div>
+
       <div id="content">
         <label for="postContent">내용:</label>
         <!-- 'name' 속성이 서버에서 req.body.postContent가 됩니다. -->
