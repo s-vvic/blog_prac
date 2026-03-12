@@ -46,7 +46,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 // -----------------------------------------------------------------
 
-const PORT = process.env.DB_PORT || 8080;
+const PORT = process.env.PORT || 8080;
 app.listen(PORT, async () => {
   // 서버가 시작될 때 DB 연결을 테스트합니다.
   try {
@@ -63,35 +63,29 @@ app.get("/", (req, res) => {
   res.redirect("index.html");
 });
 
-// -----------------------------------------------------------------
-// ▼ 새로운 글 작성을 위한 POST 라우터 ▼
-// -----------------------------------------------------------------
-app.post("/addPost", async (req, res) => {
+// 글에 이미지 추가
+app.post("/addPost", upload.single("postImage"), async (req, res) => {
+  console.log("Content-Type:", req.headers["content-type"]);
+  console.log("req.body 데이터:", req.body);
+  console.log("req.file 데이터:", req.file);
   try {
-    // 1. 클라이언트가 보낸 데이터를 req.body에서 가져옵니다.
     const { postTitle, postContent } = req.body;
+    // 업로드된 파일의 URL은 req.file.path에 담겨 있습니다.
+    const imageUrl = req.file ? req.file.path : null;
 
-    // 2. 유효성 검사
     if (!postTitle || !postContent) {
-      return res.status(400).send("제목과 내용을 모두 입력해야 합니다.");
+      return res.status(400).send("제목과 내용을 입력해주세요.");
     }
 
-    // 3. [수정] DB에 데이터를 INSERT 합니다.
-    // SQL Injection 방지를 위해 '?' 플레이스홀더 사용
-    const sql = "INSERT INTO posts (title, content) VALUES (?, ?)";
+    // DB 쿼리에 image_url 추가
+    const sql =
+      "INSERT INTO posts (title, content, image_url) VALUES (?, ?, ?)";
+    await pool.execute(sql, [postTitle, postContent, imageUrl]);
 
-    // pool.execute를 사용하면 연결-실행-반환이 한번에 처리됩니다.
-    const [result] = await pool.execute(sql, [postTitle, postContent]);
-
-    // 4. 서버 콘솔에 로그를 남깁니다.
-    console.log("새 글이 DB에 등록되었습니다 (ID: " + result.insertId + ")");
-
-    // 5. 글 작성이 완료되면, 게시판 페이지(/board.html)로 이동시킵니다.
     res.redirect("board/board.html");
   } catch (error) {
-    // 6. [추가] DB 오류 처리
-    console.error("DB 저장 중 오류 발생:", error);
-    res.status(500).send("서버 오류가 발생했습니다. DB 연결을 확인해주세요.");
+    console.error("업로드 중 오류:", error);
+    res.status(500).send("서버 오류 발생");
   }
 });
 
