@@ -153,30 +153,28 @@ app.get("/api/posts", async (req, res) => {
 
 app.get("/api/posts/:id", async (req, res) => {
   try {
-    // 1. URL 파라미터에서 'id' 값을 가져옵니다. (req.params 사용!)
     const { id } = req.params;
 
-    // 2. DB에서 특정 id의 글을 조회합니다. (SQL Injection 방지됨)
-    const sql = "SELECT id, title, content, created_at FROM posts WHERE id = ?";
+    // 1. SELECT 문에 image_url을 추가합니다.
+    const sql =
+      "SELECT id, title, content, image_url, created_at FROM posts WHERE id = ?";
     const [rows] = await pool.execute(sql, [id]);
 
-    // 3. [중요] 해당 id의 글이 없는 경우, 404 Not Found 응답을 보냅니다.
     if (rows.length === 0) {
       return res.status(404).send("해당 ID의 글을 찾을 수 없습니다.");
     }
 
-    // 4. DB에서 찾은 첫 번째 (그리고 유일한) 글을 post 변수에 저장
     const post = rows[0];
 
-    // 5. 날짜 포맷을 변경하여 최종 응답 객체를 만듭니다.
     const postDetails = {
       id: post.id,
       title: post.title,
-      content: post.content, // 상세 페이지에서는 전체 내용을 보냅니다.
+      content: post.content,
+      // 2. 응답 데이터에 image_url을 포함시킵니다.
+      imageUrl: post.image_url,
       date: new Date(post.created_at).toLocaleString("ko-KR"),
     };
 
-    // 6. JSON 형태로 클라이언트에게 응답합니다.
     res.json(postDetails);
   } catch (error) {
     console.error("DB 상세 조회 중 오류 발생:", error);
