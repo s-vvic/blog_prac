@@ -17,7 +17,7 @@
       - action="/addPost": 폼 데이터를 서버의 /addPost 경로로 보냅니다.
       - method="POST": 데이터를 전송(Create)하는 방식입니다.
     -->
-    <form action="/addPost" method="POST">
+    <form action="/addPost" method="POST" enctype="multipart/form-data">
       <div id="title">
         <label for="titleContent">제목:</label>
         <!-- 'name' 속성이 서버에서 req.body.postTitle이 됩니다. -->
