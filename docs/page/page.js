@@ -46,36 +46,37 @@ function setupButtons(postId) {
 // 서버에 특정 id의 글 상세 정보를 요청하는 비동기 함수
 async function fetchPostDetails(postId) {
   try {
-    // [중요] server.js에 새로 추가한 API 엔드포인트를 호출합니다.
-    // 예: /api/posts/5
     const response = await fetch(`/api/posts/${postId}`);
+    if (!response.ok) throw new Error(`에러: ${response.statusText}`);
 
-    // 404 (찾을 수 없음) 등 서버가 오류를 반환한 경우
-    if (!response.ok) {
-      // response.statusText는 "Not Found" 같은 문자열입니다.
-      throw new Error(`글을 찾을 수 없습니다. (에러: ${response.statusText})`);
-    }
-
-    // 5. 성공 응답(response)을 JSON 형태로 파싱합니다.
     const post = await response.json();
 
-    // 6. 받아온 post 객체의 정보로 HTML 내용을 채웁니다.
     const titleEl = document.getElementById("post-title");
     const dateEl = document.getElementById("post-date");
     const contentEl = document.getElementById("post-content");
 
-    // 로딩 메시지를 지우고, 클래스도 제거
     titleEl.textContent = post.title;
-    titleEl.classList.remove("loading");
-
     dateEl.textContent = `작성일: ${post.date}`;
-
-    // XSS 방지를 위해 textContent를 사용합니다.
-    // (page.html의 CSS 'white-space: pre-wrap'이 줄바꿈을 처리해줍니다)
     contentEl.textContent = post.content;
+
+    // ▼ 이미지를 화면에 추가하는 로직
+    if (post.imageUrl) {
+      // 이미지가 들어갈 공간을 찾거나 만듭니다.
+      let imgEl = document.getElementById("post-image");
+
+      if (!imgEl) {
+        imgEl = document.createElement("img");
+        imgEl.id = "post-image";
+        imgEl.style.maxWidth = "100%"; // 화면 너비에 맞게 조절
+        imgEl.style.marginTop = "20px";
+        imgEl.style.borderRadius = "8px";
+        // 본문(content) 위에 이미지를 넣습니다.
+        contentEl.parentNode.insertBefore(imgEl, contentEl);
+      }
+      imgEl.src = post.imageUrl;
+    }
   } catch (error) {
-    // 7. fetch 요청이나 데이터 처리 중 오류가 발생하면,
-    console.error("글 상세 정보 로딩 중 오류:", error);
+    console.error("오류:", error);
     displayError(error.message);
   }
 }
