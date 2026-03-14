@@ -57,7 +57,7 @@ async function fetchPostDetails(postId) {
 
     titleEl.textContent = post.title;
     dateEl.textContent = `작성일: ${post.date}`;
-    contentEl.textContent = post.content;
+    contentEl.innerHTML = post.content;
 
     // ▼ 이미지를 화면에 추가하는 로직
     if (post.imageUrl) {
