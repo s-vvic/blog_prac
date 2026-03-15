@@ -100,6 +100,8 @@ async function fetchPosts(page = 1) {
  * @param {Array} posts - 서버에서 받아온 글 목록 배열
  * @param {HTMLElement} postListElement - <ul> 태그 요소
  */
+let isDeleteMode = false;
+
 function renderPosts(posts, postListElement) {
   postListElement.innerHTML = ""; // 로딩 메시지 또는 이전 목록 제거
 
@@ -119,7 +121,8 @@ function renderPosts(posts, postListElement) {
     const checkbox = document.createElement("input");
     checkbox.type = "checkbox";
     checkbox.className = "post-checkbox";
-    checkbox.value = post.id; // 글의 ID를 value에 담습니다.
+    checkbox.value = post.id;
+    checkbox.style.display = isDeleteMode ? "block" : "none"; // 모드에 따라 결정
     checkbox.style.marginRight = "15px";
 
     // (이전과 동일한 <a> 태그 생성 로직)
@@ -146,6 +149,66 @@ function renderPosts(posts, postListElement) {
     postListElement.appendChild(postItem);
   });
 }
+
+// 2. 삭제 모드 전환 함수
+function toggleDeleteMode(on) {
+  isDeleteMode = on;
+  const modeBtn = document.getElementById("bulk-delete-mode-btn");
+  const confirmBtn = document.getElementById("bulk-delete-confirm-btn");
+  const cancelBtn = document.getElementById("bulk-delete-cancel-btn");
+  const checkboxes = document.querySelectorAll(".post-checkbox");
+
+  if (on) {
+    modeBtn.style.display = "none";
+    confirmBtn.style.display = "inline-block";
+    cancelBtn.style.display = "inline-block";
+    checkboxes.forEach((cb) => (cb.style.display = "block"));
+  } else {
+    modeBtn.style.display = "inline-block";
+    confirmBtn.style.display = "none";
+    cancelBtn.style.display = "none";
+    checkboxes.forEach((cb) => {
+      cb.style.display = "none";
+      cb.checked = false; // 취소 시 체크 해제
+    });
+  }
+}
+
+// 3. 버튼 이벤트 등록
+document.addEventListener("DOMContentLoaded", () => {
+  // '일괄 삭제' 버튼 클릭 시
+  document
+    .getElementById("bulk-delete-mode-btn")
+    .addEventListener("click", () => toggleDeleteMode(true));
+
+  // '취소' 버튼 클릭 시
+  document
+    .getElementById("bulk-delete-cancel-btn")
+    .addEventListener("click", () => toggleDeleteMode(false));
+
+  // '삭제 실행' 버튼 클릭 시
+  document
+    .getElementById("bulk-delete-confirm-btn")
+    .addEventListener("click", async () => {
+      const selected = document.querySelectorAll(".post-checkbox:checked");
+      const ids = Array.from(selected).map((cb) => cb.value);
+
+      if (ids.length === 0) return alert("삭제할 글을 선택해주세요.");
+
+      if (confirm(`${ids.length}개의 글을 삭제하시겠습니까?`)) {
+        const res = await fetch("/api/posts/bulk", {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ ids }),
+        });
+
+        if (res.ok) {
+          alert("삭제 완료!");
+          location.reload();
+        }
+      }
+    });
+});
 
 /**
  * [헬퍼 함수] 페이지네이션 버튼들을 생성하여 화면에 그립니다.

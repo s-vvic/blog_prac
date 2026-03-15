@@ -206,7 +206,7 @@ body {
   border-radius: 6px;
   text-decoration: none;
 }
-.page-header button {
+#bulk-delete-btn {
   margin-bottom: 1.5em;
   background-color: #ff4d4d;
   color: white;
@@ -215,6 +215,14 @@ body {
   border-radius: 6px;
   cursor: pointer;
   margin-left: 10px;
+}
+#bulk-delete-confirm-btn {
+  display: none;
+  background-color: #ff4d4d;
+  color: white;
+}
+#bulk-delete-cancel-btn {
+  display: none;
 }
 .page-header a:hover {
   background: #0056b3;
