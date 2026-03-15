@@ -63,13 +63,17 @@ app.get("/", (req, res) => {
   res.redirect("index.html");
 });
 
-// 이미지 하나만 업로드하고 URL을 반환하는 전용 라우터
-app.post("/api/upload", upload.single("image"), (req, res) => {
-  if (!req.file) {
-    return res.status(400).send("파일 업로드 실패");
+app.post("/api/upload", upload.single("postImage"), (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).send("파일이 업로드되지 않았습니다.");
+    }
+    // Cloudinary에 저장된 실제 이미지 URL 주소를 클라이언트에 돌려줍니다.
+    res.json({ url: req.file.path });
+  } catch (error) {
+    console.error("에디터 이미지 업로드 오류:", error);
+    res.status(500).send("서버 오류 발생");
   }
-  // Cloudinary가 준 URL을 클라이언트에 돌려줍니다.
-  res.json({ url: req.file.path });
 });
 
 // 기존 /addPost 수정: 이제 content 안에 HTML(이미지 포함)이 통째로 들어옵니다.
@@ -175,32 +179,6 @@ app.get("/api/posts/:id", async (req, res) => {
   } catch (error) {
     console.error("DB 상세 조회 중 오류 발생:", error);
     res.status(500).send("서버 오류가 발생했습니다.");
-  }
-});
-
-// 글에 이미지 추가
-app.post("/addPost", upload.single("postImage"), async (req, res) => {
-  console.log("Content-Type:", req.headers["content-type"]);
-  console.log("req.body 데이터:", req.body);
-  console.log("req.file 데이터:", req.file);
-  try {
-    const { postTitle, postContent } = req.body;
-    // 업로드된 파일의 URL은 req.file.path에 담겨 있습니다.
-    const imageUrl = req.file ? req.file.path : null;
-
-    if (!postTitle || !postContent) {
-      return res.status(400).send("제목과 내용을 입력해주세요.");
-    }
-
-    // DB 쿼리에 image_url 추가
-    const sql =
-      "INSERT INTO posts (title, content, image_url) VALUES (?, ?, ?)";
-    await pool.execute(sql, [postTitle, postContent, imageUrl]);
-
-    res.redirect("board/board.html");
-  } catch (error) {
-    console.error("업로드 중 오류:", error);
-    res.status(500).send("서버 오류 발생");
   }
 });
 

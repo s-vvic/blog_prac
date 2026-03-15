@@ -1,7 +1,8 @@
 <head>
-  <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+  <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet" />
   <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/quill-image-resize-module@3.0.0/image-resize.min.js"></script>
+  <script src="index.js" defer></script>
 </head>
 
 <body>
@@ -11,34 +12,10 @@
       <input type="text" id="titleContent" name="postTitle" required />
     </div>
 
-    <div id="editor-container" style="height: 400px; margin-bottom: 20px;"></div>
-    
-    <input type="hidden" name="postContent" id="postContent">
+    <div id="editor-container" style="height: 400px; margin-bottom: 20px"></div>
+
+    <input type="hidden" name="postContent" id="postContent" />
 
     <button type="submit">글쓰기</button>
   </form>
-
-  <script>
-    // Quill 에디터 초기화
-    var quill = new Quill('#editor-container', {
-      modules: {
-        toolbar: [
-          [{ 'header': [1, 2, false] }],
-          ['bold', 'italic', 'underline'],
-          ['image', 'code-block'] // 이미지 버튼 추가
-        ],
-        imageResize: { // 이미지 크기 조절 모듈 활성화
-          modules: [ 'Resize', 'DisplaySize', 'Toolbar' ]
-        }
-      },
-      theme: 'snow'
-    });
-
-    // 폼 전송 시 에디터 내용을 hidden input에 담기
-    const form = document.getElementById('post-form');
-    form.onsubmit = function() {
-      const content = document.querySelector('#postContent');
-      content.value = quill.root.innerHTML; // 에디터의 HTML 내용을 담습니다.
-    };
-  </script>
 </body>
