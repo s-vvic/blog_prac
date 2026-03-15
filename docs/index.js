@@ -1,3 +1,4 @@
+let isDeleteMode = false;
 // HTML 문서가 모두 로드되었을 때 이 함수를 실행합니다.
 window.addEventListener("DOMContentLoaded", () => {
   // 1. URL의 해시(#)에서 페이지 번호를 읽어옵니다. 없으면 1페이지.
@@ -7,19 +8,20 @@ window.addEventListener("DOMContentLoaded", () => {
   // 2. 첫 페이지 로드를 시작합니다.
   fetchPosts(initialPage);
 
-  document
-    .getElementById("bulk-delete-mode-btn")
-    .addEventListener("click", () => toggleDeleteMode(true));
+  const modeBtn = document.getElementById("bulk-delete-mode-btn");
+  const cancelBtn = document.getElementById("bulk-delete-cancel-btn");
+  const confirmBtn = document.getElementById("bulk-delete-confirm-btn");
 
-  // '취소' 버튼 클릭 시
-  document
-    .getElementById("bulk-delete-cancel-btn")
-    .addEventListener("click", () => toggleDeleteMode(false));
+  if (modeBtn) {
+    modeBtn.addEventListener("click", () => toggleDeleteMode(true));
+  }
 
-  // '삭제 실행' 버튼 클릭 시
-  document
-    .getElementById("bulk-delete-confirm-btn")
-    .addEventListener("click", async () => {
+  if (cancelBtn) {
+    cancelBtn.addEventListener("click", () => toggleDeleteMode(false));
+  }
+
+  if (confirmBtn) {
+    confirmBtn.addEventListener("click", async () => {
       const selected = document.querySelectorAll(".post-checkbox:checked");
       const ids = Array.from(selected).map((cb) => cb.value);
 
@@ -38,6 +40,7 @@ window.addEventListener("DOMContentLoaded", () => {
         }
       }
     });
+  }
 
   // 3. 페이지네이션 버튼 클릭에 대한 이벤트 리스너를 <nav>에 한 번만 등록 (이벤트 위임)
   const paginationNav = document.getElementById("pagination-nav");
@@ -102,7 +105,6 @@ async function fetchPosts(page = 1) {
  * @param {Array} posts - 서버에서 받아온 글 목록 배열
  * @param {HTMLElement} postListElement - <ul> 태그 요소
  */
-let isDeleteMode = false;
 
 function renderPosts(posts, postListElement) {
   postListElement.innerHTML = ""; // 로딩 메시지 또는 이전 목록 제거
