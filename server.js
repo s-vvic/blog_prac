@@ -191,18 +191,37 @@ app.get("/api/posts/:id", async (req, res) => {
 app.delete("/api/posts/:id", async (req, res) => {
   try {
     const { id } = req.params;
-    const sql = "DELETE FROM posts WHERE id = ?";
-    const [result] = await pool.execute(sql, [id]);
 
-    if (result.affectedRows === 0) {
-      return res.status(404).send("삭제할 글을 찾을 수 없습니다.");
+    // 1. 삭제 전, 해당 글의 본문을 먼저 가져옵니다.
+    const [rows] = await pool.execute(
+      "SELECT content FROM posts WHERE id = ?",
+      [id],
+    );
+    if (rows.length > 0) {
+      const content = rows[0].content;
+
+      // 2. 본문에서 Cloudinary 이미지 URL을 모두 찾습니다 (정규표현식)
+      const imgRegex = /https:\/\/res\.cloudinary\.com\/[^\s"'>]+/g;
+      const imageUrls = content.match(imgRegex) || [];
+
+      // 3. 각 이미지의 public_id를 추출하여 Cloudinary에서 삭제합니다.
+      for (const url of imageUrls) {
+        // URL에서 파일명(public_id) 부분만 추출합니다.
+        const parts = url.split("/");
+        const fileName = parts[parts.length - 1].split(".")[0];
+        const folderName = parts[parts.length - 2];
+        const publicId = `${folderName}/${fileName}`; // 예: blog_images/17000000
+
+        await cloudinary.uploader.destroy(publicId);
+      }
     }
 
-    console.log(`글 삭제 완료 (ID: ${id})`);
+    // 4. 이제 DB에서 글을 삭제합니다.
+    await pool.execute("DELETE FROM posts WHERE id = ?", [id]);
     res.status(200).send("삭제 성공");
   } catch (error) {
-    console.error("DB 삭제 중 오류:", error);
-    res.status(500).send("서버 오류가 발생했습니다.");
+    console.error("삭제 중 오류:", error);
+    res.status(500).send("서버 오류");
   }
 });
 
