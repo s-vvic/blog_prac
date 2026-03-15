@@ -6,7 +6,8 @@ html,
 body {
   height: 100%; /* html과 body가 뷰포트 전체 높이를 갖도록 함 */
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 
   /* [중요] body 자체의 스크롤을 막습니다. */
   overflow: hidden;
@@ -111,7 +112,10 @@ body {
   overflow-y: auto; /* 사이드바 자체 스크롤 */
 
   /* 부드러운 너비 변경을 위한 트랜지션 */
-  transition: width 0.3s ease, flex-basis 0.3s ease, padding 0.3s ease;
+  transition:
+    width 0.3s ease,
+    flex-basis 0.3s ease,
+    padding 0.3s ease;
 }
 .sidebar-widget {
   background: #fff;
@@ -202,6 +206,16 @@ body {
   border-radius: 6px;
   text-decoration: none;
 }
+.page-header button {
+  margin-bottom: 1.5em;
+  background-color: #ff4d4d;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-left: 10px;
+}
 .page-header a:hover {
   background: #0056b3;
 }
@@ -273,7 +287,9 @@ body {
   border-radius: 4px;
   cursor: pointer;
   font-size: 1em;
-  transition: background-color 0.2s, color 0.2s;
+  transition:
+    background-color 0.2s,
+    color 0.2s;
 }
 #pagination-nav button:hover {
   background-color: #f4f4f4;

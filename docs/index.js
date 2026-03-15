@@ -7,6 +7,36 @@ window.addEventListener("DOMContentLoaded", () => {
   // 2. 첫 페이지 로드를 시작합니다.
   fetchPosts(initialPage);
 
+  document
+    .getElementById("bulk-delete-btn")
+    .addEventListener("click", async () => {
+      const checkboxes = document.querySelectorAll(".post-checkbox:checked");
+      const idsToDelete = Array.from(checkboxes).map((cb) => cb.value);
+
+      if (idsToDelete.length === 0) {
+        return alert("삭제할 글을 선택해주세요.");
+      }
+
+      if (confirm(`선택한 ${idsToDelete.length}개의 글을 삭제하시겠습니까?`)) {
+        try {
+          const response = await fetch("/api/posts/bulk", {
+            method: "DELETE",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ ids: idsToDelete }),
+          });
+
+          if (response.ok) {
+            alert("성공적으로 삭제되었습니다.");
+            location.reload(); // 목록 새로고침
+          } else {
+            alert("삭제에 실패했습니다.");
+          }
+        } catch (error) {
+          console.error("일괄 삭제 중 오류:", error);
+        }
+      }
+    });
+
   // 3. 페이지네이션 버튼 클릭에 대한 이벤트 리스너를 <nav>에 한 번만 등록 (이벤트 위임)
   const paginationNav = document.getElementById("pagination-nav");
   if (paginationNav) {
@@ -82,6 +112,15 @@ function renderPosts(posts, postListElement) {
   // 6. 받아온 'posts' 배열을 순회하면서 HTML을 만듭니다.
   posts.forEach((post) => {
     const postItem = document.createElement("li");
+    postItem.style.display = "flex";
+    postItem.style.alignItems = "center";
+
+    // 1. 체크박스 생성
+    const checkbox = document.createElement("input");
+    checkbox.type = "checkbox";
+    checkbox.className = "post-checkbox";
+    checkbox.value = post.id; // 글의 ID를 value에 담습니다.
+    checkbox.style.marginRight = "15px";
 
     // (이전과 동일한 <a> 태그 생성 로직)
     const linkElement = document.createElement("a");
@@ -102,6 +141,7 @@ function renderPosts(posts, postListElement) {
     linkElement.appendChild(document.createElement("br"));
     linkElement.appendChild(dateEl);
 
+    postItem.appendChild(checkbox); // 체크박스 추가
     postItem.appendChild(linkElement);
     postListElement.appendChild(postItem);
   });
