@@ -128,13 +128,18 @@ app.get("/api/posts", async (req, res) => {
     const [postsRows] = await pool.execute(postsSql);
 
     // 4. 가져온 글 목록의 포맷을 변경합니다.
-    const posts = postsRows.map((post) => ({
-      id: post.id,
-      title: post.title,
-      content:
-        post.content.substring(0, 50) + (post.content.length > 50 ? "..." : ""),
-      date: new Date(post.created_at).toLocaleString("ko-KR"),
-    }));
+    const posts = postsRows.map((post) => {
+      const plainText = post.content.replace(/<[^>]*>?/gm, "");
+
+      return {
+        id: post.id,
+        title: post.title,
+        content:
+          post.content.substring(0, 50) +
+          (post.content.length > 50 ? "..." : ""),
+        date: new Date(post.created_at).toLocaleString("ko-KR"),
+      };
+    });
 
     // 5. [수정] JSON 응답에 '글 목록(posts)'과 '총 페이지 수(totalPages)'를 함께 보냅니다.
     res.json({
