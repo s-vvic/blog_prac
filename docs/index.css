@@ -206,7 +206,7 @@ body {
   border-radius: 6px;
   text-decoration: none;
 }
-#bulk-delete-btn {
+#bulk-delete-mode-btn {
   margin-bottom: 1.5em;
   background-color: #ff4d4d;
   color: white;

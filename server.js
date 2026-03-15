@@ -188,17 +188,23 @@ app.get("/api/posts/:id", async (req, res) => {
 
 // 글 삭제 로직
 app.delete("/api/posts/:id", async (req, res) => {
-  try {
-    const { id } = req.params;
-    if (!ids || !Array.isArray(ids) || ids.length === 0) {
-      return res.status(400).send("삭제할 항목이 선택되지 않았습니다.");
-    }
+  const { ids } = req.body;
 
-    // 1. 삭제 전, 해당 글의 본문을 먼저 가져옵니다.
+  // 데이터가 잘 들어왔는지 서버 콘솔에서 확인해보세요.
+  console.log("삭제 요청받은 ID들:", ids);
+
+  if (!ids || !Array.isArray(ids) || ids.length === 0) {
+    return res.status(400).send("삭제할 ID가 없습니다.");
+  }
+
+  try {
+    // 1. 이미지 삭제를 위한 조회
+    // 주의: IN (?) 형태에서는 query 메서드를 사용하고 [ids] 형태로 넘깁니다.
     const [rows] = await pool.query(
       "SELECT content FROM posts WHERE id IN (?)",
       [ids],
     );
+
     for (const row of rows) {
       const imgRegex = /https:\/\/res\.cloudinary\.com\/[^\s"'>]+/g;
       const imageUrls = row.content.match(imgRegex) || [];
@@ -206,16 +212,24 @@ app.delete("/api/posts/:id", async (req, res) => {
         const parts = url.split("/");
         const fileName = parts[parts.length - 1].split(".")[0];
         const folderName = parts[parts.length - 2];
-        await cloudinary.uploader.destroy(`${folderName}/${fileName}`);
+        // Cloudinary 삭제 시 에러가 나도 전체 프로세스가 멈추지 않게 처리
+        await cloudinary.uploader
+          .destroy(`${folderName}/${fileName}`)
+          .catch((e) => console.log("이미지 삭제 실패(무시):", e));
       }
     }
 
-    // 4. 이제 DB에서 글을 삭제합니다.
-    await pool.query("DELETE FROM posts WHERE id IN (?)", [ids]);
-    res.status(200).send("성공적으로 삭제되었습니다.");
+    // 2. DB에서 일괄 삭제
+    const [result] = await pool.query("DELETE FROM posts WHERE id IN (?)", [
+      ids,
+    ]);
+
+    console.log(`일괄 삭제 완료: ${result.affectedRows}개 행 삭제됨`);
+    res.status(200).send("삭제 성공");
   } catch (error) {
-    console.error("일괄 삭제 중 오류:", error);
-    res.status(500).send("서버 오류가 발생했습니다.");
+    // 500 에러 발생 시 서버 로그에 에러 내용을 자세히 찍어줍니다.
+    console.error("일괄 삭제 API 서버 에러:", error);
+    res.status(500).send("서버 내부 오류 발생");
   }
 });
 

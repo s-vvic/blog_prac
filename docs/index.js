@@ -12,11 +12,8 @@ window.addEventListener("DOMContentLoaded", () => {
   const cancelBtn = document.getElementById("bulk-delete-cancel-btn");
   const confirmBtn = document.getElementById("bulk-delete-confirm-btn");
 
-  console.log("버튼 찾음:", modeBtn);
-
   if (modeBtn) {
     modeBtn.addEventListener("click", () => {
-      console.log("삭제 모드 버튼 클릭됨!"); // 클릭했을 때 이 로그가 찍히는지 확인
       toggleDeleteMode(true);
     });
   }
