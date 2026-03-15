@@ -135,8 +135,7 @@ app.get("/api/posts", async (req, res) => {
         id: post.id,
         title: post.title,
         content:
-          post.content.substring(0, 50) +
-          (post.content.length > 50 ? "..." : ""),
+          plainText.substring(0, 50) + (plainText.length > 50 ? "..." : ""),
         date: new Date(post.created_at).toLocaleString("ko-KR"),
       };
     });
