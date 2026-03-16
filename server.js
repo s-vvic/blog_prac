@@ -188,12 +188,14 @@ app.get("/api/posts/:id", async (req, res) => {
 
 // 글 삭제 로직
 app.delete("/api/posts/:id", async (req, res) => {
-  const { ids } = req.body;
+  const { ids, password } = req.body;
 
-  // 데이터가 잘 들어왔는지 서버 콘솔에서 확인해보세요.
-  console.log("삭제 요청받은 ID들:", ids);
+  if (password !== process.env.ADMIN_PASSWORD) {
+    console.log("경고: 잘못된 비밀번호로 삭제 시도가 있었습니다.");
+    return res.status(401).send("비밀번호를 확인해 주세요.");
+  }
 
-  if (!ids || !Array.isArray(ids) || ids.length === 0) {
+  if (!ids || ids.length === 0) {
     return res.status(400).send("삭제할 ID가 없습니다.");
   }
 

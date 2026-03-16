@@ -23,25 +23,36 @@ window.addEventListener("DOMContentLoaded", () => {
   }
 
   if (confirmBtn) {
-    confirmBtn.addEventListener("click", async () => {
-      const selected = document.querySelectorAll(".post-checkbox:checked");
-      const ids = Array.from(selected).map((cb) => cb.value);
+    document
+      .getElementById("bulk-delete-confirm-btn")
+      .addEventListener("click", async () => {
+        const selected = document.querySelectorAll(".post-checkbox:checked");
+        const ids = Array.from(selected).map((cb) => cb.value);
 
-      if (ids.length === 0) return alert("삭제할 글을 선택해주세요.");
+        if (ids.length === 0) return alert("삭제할 글을 선택해주세요.");
 
-      if (confirm(`${ids.length}개의 글을 삭제하시겠습니까?`)) {
-        const res = await fetch("/api/posts/bulk", {
-          method: "DELETE",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ ids }),
-        });
+        // 1. 비밀번호 입력받기
+        const password = prompt("관리자 비밀번호를 입력하세요.");
+        if (!password) return; // 취소 누르면 중단
 
-        if (res.ok) {
-          alert("삭제 완료!");
-          location.reload();
+        if (confirm(`${ids.length}개의 글을 삭제하시겠습니까?`)) {
+          const res = await fetch("/api/posts/bulk", {
+            method: "DELETE",
+            headers: { "Content-Type": "application/json" },
+            // 2. 비밀번호를 데이터와 함께 전송
+            body: JSON.stringify({ ids, password }),
+          });
+
+          if (res.ok) {
+            alert("삭제 완료!");
+            location.reload();
+          } else {
+            // 서버에서 401(미인증) 에러가 오면 처리
+            const errorMsg = await res.text();
+            alert(`삭제 실패: ${errorMsg}`);
+          }
         }
-      }
-    });
+      });
   }
 
   // 3. 페이지네이션 버튼 클릭에 대한 이벤트 리스너를 <nav>에 한 번만 등록 (이벤트 위임)
