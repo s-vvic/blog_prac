@@ -30,4 +30,6 @@ window.addEventListener("DOMContentLoaded", async () => {
     });
     location.href = `../page/page.html?id=${postId}`;
   });
+
+  // 4. 취소 버튼 클릭 시
 });
